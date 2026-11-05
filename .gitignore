@@ -1,0 +1,6 @@
+# Local junk
+*.log
+*.tar.xz
+*.exe
+.vnc/
+.DS_Store
