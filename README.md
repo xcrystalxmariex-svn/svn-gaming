@@ -8,6 +8,7 @@ One-file installers that build a Linux desktop with Wine and the Windows Steam c
 |---|---|---|
 | `setup-termux.sh` | Termux (F-Droid build) on ARM64 Android | Ubuntu PRoot, XFCE, TigerVNC, Box64, Wine 10, Steam installer |
 | `setup-ubuntu-server.sh` | Ubuntu 22.04+ server, x86_64 or arm64 | XFCE, TigerVNC, noVNC browser viewer, Wine 10 (Box64 added on ARM), Steam installer |
+| `Dockerfile` + `docker/start.sh` | Any container platform or Docker host | The same browser desktop as a container, served on port 8000 |
 
 Both scripts ask for a VNC password once at the start and can be re-run safely; finished steps are skipped or repeated without harm.
 
@@ -46,6 +47,20 @@ To use it:
 5. Stop it with `bash ~/desktop-stop.sh`.
 
 To keep the viewer off the public internet, start it with `NOVNC_BIND=127.0.0.1 bash ~/desktop-start.sh` and reach it through an SSH tunnel: `ssh -L 6080:localhost:6080 <user>@<server-ip>`, then open `http://localhost:6080/vnc.html`.
+
+## Container platform (Dockerfile)
+
+The `Dockerfile` builds the browser desktop as one container. The platform's web URL opens the desktop directly.
+
+1. Set the framework or build type to **Dockerfile** (not Python or another auto-detected framework).
+2. Set the port to **8000**.
+3. Add an environment variable `VNC_PASSWORD` (6 to 8 characters). Without it, a random password is printed in the logs on each start.
+4. Optional: `VNC_GEOMETRY` (default `1280x720`).
+5. Deploy, open the app URL, enter the password, then run `~/Desktop/install-steam.sh` from a terminal on the desktop.
+
+Pick a plan with at least 4 GB of RAM if you want Steam to stay up. Anything installed inside the container (Steam, games) is lost on redeploy unless the platform offers a persistent volume mounted at `/home/gamer`.
+
+To run it on your own machine: `docker build -t svn-gaming . && docker run -p 8000:8000 -e VNC_PASSWORD=change1 svn-gaming`, then open `http://localhost:8000`.
 
 ## Known limits
 
